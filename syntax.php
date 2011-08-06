@@ -7,22 +7,9 @@
  * last modified: 2006-06-14 12:00:00
  * @license     GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author      Hubert Molière  <hubert.moliere@alternet.fr>
- */
-
-/**
- * Configuration additionnelle sp�cifique au plugin
- *
- * - $conf['plugin']['alphaindex']['numerical_index']
- * - $conf['plugin']['alphaindex']['articles_deletion']
- * - $conf['plugin']['alphaindex']['articles_moving']
- * - $conf['plugin']['alphaindex']['empty_msg']
- * - $conf['plugin']['alphaindex']['title_tpl']
- * - $conf['plugin']['alphaindex']['begin_letter_tpl']
- * - $conf['plugin']['alphaindex']['entry_tpl']
- * - $conf['plugin']['alphaindex']['end_letter_tpl']
- * - $conf['plugin']['alphaindex']['hidepages']
- * - $conf['plugin']['alphaindex']['metadata_title'] (true/false)
- *
+ * Modified by  Nicolas H. <prog@a-et-n.com>
+ * Modified by  Jonesy <jonesy@oryma.org>
+ * Modified by  Samuele Tognini <samuele@netsons.org>
  */
 
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
@@ -94,12 +81,12 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {
         global $conf;
-        
+
         if($mode == 'xhtml'){
             $alpha_data = $this->_alpha_index($data, $renderer);
             if ((!@$n)) {
-                if (isset ($conf['plugin']['']['empty_msg'])) {
-                    $n = $conf['plugin_alphaindex']['empty_msg'];
+                if ($this->getConf('empty_msg')) {
+                    $n = $this->getConf('empty_msg');
                 } else {
                     $n = 'No index for <b>{{ns}}</b>';
                 }
@@ -145,8 +132,8 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 
         // Articles deletion configuration
         $articlesDeletionPatterns = array();
-        if(isset($conf['plugin']['alphaindex']['articles_deletion'])) {
-            $articlesDeletionPatterns = explode('|', $conf['plugin']['alphaindex']['articles_deletion']);
+        if($this->getConf('articles_deletion')) {
+            $articlesDeletionPatterns = explode('|', $this->getConf('articles_deletion'));
             $articlesDeletion = true;
         } else {
             $articlesDeletion = false;
@@ -154,31 +141,31 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 
         // Hide pages configuration
         $hidepages = array();
-        if(isset($conf['plugin']['alphaindex']['hidepages'])) {
-            $hidepages = explode('|', $conf['plugin']['alphaindex']['hidepages']);
+        if($this->getConf('hidepages')) {
+            $hidepages = explode('|', $this->getConf('hidepages'));
         }
 
         // template configuration
-        if(isset($conf['plugin']['alphaindex']['title_tpl'])) {
-            $titleTpl = $conf['plugin']['alphaindex']['title_tpl'];
+        if($this->getConf('title_tpl')) {
+            $titleTpl = $this->getConf('title_tpl');
         } else {
             $titleTpl = '===== Index =====';
         }
         
-        if(isset($conf['plugin']['alphaindex']['begin_letter_tpl'])) {
-            $beginLetterTpl = $conf['plugin']['alphaindex']['begin_letter_tpl'];
+        if($this->getConf('begin_letter_tpl')) {
+            $beginLetterTpl = $this->getConf('begin_letter_tpl');
         } else {
             $beginLetterTpl = '==== {{letter}} ====';
         }
         
-        if(isset($conf['plugin']['alphaindex']['entry_tpl'])) {
-            $entryTpl = $conf['plugin']['alphaindex']['entry_tpl'];
+        if($this->getConf('entry_tpl')) {
+            $entryTpl = $this->getConf('entry_tpl');
         } else {
             $entryTpl = '  * [[{{link}}|{{name}}]]';
         }
         
-        if(isset($conf['plugin']['alphaindex']['end_letter_tpl'])) {
-            $endLetterTpl = $conf['plugin']['alphaindex']['end_letter_tpl'];
+        if($this->getConf('end_letter_tpl')) {
+            $endLetterTpl = $this->getConf('end_letter_tpl');
         } else {
             $endLetterTpl = '';
         }
@@ -238,7 +225,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                 }
                 
                 // Fix for useheading - Decide if the heading is used or the pagename
-                if(isset($conf['plugin']['alphaindex']['metadata_title'])) {
+                if($this->getConf('metadata_title')) {
                     $tmp = p_get_metadata($data[$cpt]['id']);
                     if(isset($tmp['title'])) $pageName = $tmp['title'];
         		}
