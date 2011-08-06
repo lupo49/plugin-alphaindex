@@ -61,7 +61,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
     function handle($match, $state, $pos, &$handler){
         $level = 0;
         $nons = true;
-        $match = substr($match,12,-2);
+        $match = substr($match, 13, -2);
         
         //split namespaces
         $match = preg_split('/\|/u', $match, 2);
