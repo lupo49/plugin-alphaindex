@@ -1,0 +1,7 @@
+base   alphaindex
+author Hubert Molière
+email  takashi [at] natural [dash] design [dot] net
+date   2008-10-18
+name   alphaindex plugin
+desc   Allows you to insert the alphabetical index of a namespace in a page
+url    http://dokuwiki.org/plugin:alphaindex
