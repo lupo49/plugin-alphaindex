@@ -39,6 +39,8 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
     
     function getAllowedTypes() { return array('baseonly', 'substition', 'formatting', 'paragraphs', 'protected'); }
 
+    function getPType() { return 'block'; }
+    
     /**
      * Where to sort in?
      */
@@ -83,7 +85,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         // multi-columns option
         $incol = in_array('incol', $match);
         
-        return array($ns,array('level' => $level, 'nons' => $nons, 'incol' => $incol));
+        return array($ns, array('level' => $level, 'nons' => $nons, 'incol' => $incol));
     }
 
     /**
@@ -95,14 +97,14 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         if($mode == 'xhtml'){
             $alpha_data = $this->_alpha_index($data, $renderer);
             if ((!@$n)) {
-                if (isset ($conf['plugin']['alphaindex']['empty_msg'])) {
+                if (isset ($conf['plugin']['']['empty_msg'])) {
                     $n = $conf['plugin_alphaindex']['empty_msg'];
                 } else {
                     $n = 'No index for <b>{{ns}}</b>';
                 }
             }
             
-            $alpha_data = utf8_substr_replace('{{ns}}',cleanID($data[0]),$alpha_data);
+            $alpha_data = str_replace('{{ns}}', cleanID($data[0]), $alpha_data);
 
             $alpha_data = p_render('xhtml', p_get_instructions($alpha_data), $info);
 
@@ -112,7 +114,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                             '!<div class="category">.*?</div>!s');
             $replace  = array('','','');
             $alpha_data = preg_replace($patterns, $replace, $alpha_data);
-            $renderer->doc .= '<div id="alphaindex">' ;
+            $renderer->doc .= '<div id="alphaindex_content">' ;
             $renderer->doc .= $ns_data;
             $renderer->doc .= '<hr />';
             $renderer->doc .= $alpha_data;
@@ -209,7 +211,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                     } else {
                         $pageName = $tmpData;
                     }
-                    $pageName = utf8_substr_replace('_', ' ', $pageName);
+                    $pageName = str_replace('_', ' ', $pageName);
                 }
             } else {
                 if($pos != FALSE) {
@@ -218,7 +220,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                     $pageName = $tmpData;
                 }
                 
-                $pageName = utf8_substr_replace('_', ' ', $pageName);
+                $pageName = str_replace('_', ' ', $pageName);
             }
             $pageNameArticle = '';
 
@@ -266,22 +268,22 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         // Display of results
 
         // alphabetical index
-        $alphaOutput .= $titleTpl."\n";
+        $alphaOutput .= $titleTpl . "\n";
         $nb_data = count($alpha_data);
         
         foreach($alpha_data as $key => $currentLetter) {
             // Sorting of $currentLetter array
             usort($currentLetter, create_function('$a, $b', "return strnatcasecmp(\$a['id2'], \$b['id2']);"));
 
-            $begin = utf8_substr_replace("{{letter}}" ,utf8_strtoupper($key), $beginLetterTpl);
+            $begin = str_replace("{{letter}}" ,utf8_strtoupper($key), $beginLetterTpl);
             $alphaOutput .= $begin."\n";
             foreach($currentLetter as $currentLetterEntry) {
-                $link = utf8_substr_replace("{{link}}" ,$currentLetterEntry['id'], $entryTpl);
-                $alphaOutput .= utf8_substr_replace("{{name}}" ,$currentLetterEntry['id2'], $link);
+                $link = str_replace("{{link}}" ,$currentLetterEntry['id'], $entryTpl);
+                $alphaOutput .= str_replace("{{name}}" ,$currentLetterEntry['id2'], $link);
                 $alphaOutput .= "\n";
             }
 
-            $end = utf8_substr_replace("{{letter}}" ,utf8_strtoupper($key), $endLetterTpl);
+            $end = str_replace("{{letter}}" ,utf8_strtoupper($key), $endLetterTpl);
             $alphaOutput .= $end."\n";
         }
 
