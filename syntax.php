@@ -51,16 +51,26 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         $nons = true;
         $match = substr($match, 13, -2);
         
-        //split namespaces
+        // split namespaces
         $match = preg_split('/\|/u', $match, 2);
         
-        //split level
+        // split level
         $ns_opt = preg_split('/\#/u', $match[0], 2);
         
-        //namespace name
+        // namespace name
         $ns = $ns_opt[0];
         
-        //level;
+        // add @NS@ option
+        if(empty($ns) || $ns == '@NS@') {
+            $pos = strrpos($ID,':');
+              if($pos != false){
+	                $ns = substr($ID,0,$pos);
+              } else {
+	              $ns = '.';
+              }
+        }
+        
+        // level;
         if (is_numeric($ns_opt[1])) {
             $level = $ns_opt[1];
         }
@@ -234,15 +244,15 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                 $firstLetter = utf8_deaccent(utf8_strtolower(utf8_substr($pageName, 0, 1)));
                 
                 if(is_numeric($firstLetter)) {
-                    if(isset($conf['plugin']['alphaindex']['numerical_index'])) {
-                        $firstLetter = $conf['plugin']['alphaindex']['numerical_index'];
+                    if($this->getConf('numerical_index')) {
+                        $firstLetter = $this->getConf('numerical_index');
                     } else {
                         $firstLetter = '0-9';
                     }
                 }
 
-                if(isset($conf['plugin']['alphaindex']['article_moving'])) {
-                    $articleMoving = $conf['plugin']['alphaindex']['article_moving'];
+                if($this->getConf('articles_moving')) {
+                    $articleMoving = $this->getConf('articles_moving');
                 } else {
                     $articleMoving = 1;
                 }
