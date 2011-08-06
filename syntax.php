@@ -21,6 +21,7 @@
  * - $conf['plugin']['alphaindex']['entry_tpl']
  * - $conf['plugin']['alphaindex']['end_letter_tpl']
  * - $conf['plugin']['alphaindex']['hidepages']
+ * - $conf['plugin']['alphaindex']['metadata_title'] (true/false)
  *
  */
 
@@ -235,7 +236,14 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                         }
                     }
                 }
-                // R�cup�ration de la premi�re lettre du mot et classement
+                
+                // Fix for useheading - Decide if the heading is used or the pagename
+                if(isset($conf['plugin']['alphaindex']['metadata_title'])) {
+                    $tmp = p_get_metadata($data[$cpt]['id']);
+                    if(isset($tmp['title'])) $pageName = $tmp['title'];
+        		}
+
+        		// R�cup�ration de la premi�re lettre du mot et classement
                 $firstLetter = utf8_deaccent(utf8_strtolower(utf8_substr($pageName, 0, 1)));
                 
                 if(is_numeric($firstLetter)) {
