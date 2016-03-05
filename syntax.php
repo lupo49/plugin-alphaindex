@@ -46,7 +46,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         $level = 0;
         $nons = true;
         $match = substr($match, 13, -2);
@@ -89,7 +89,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
     /**
      * Render output
      */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         global $conf;
 
         if($mode == 'xhtml'){
