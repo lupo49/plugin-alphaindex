@@ -105,20 +105,30 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 
             $alpha_data = str_replace('{{ns}}', cleanID($data[0]), $alpha_data);
 
+            // Remove Section Edit Buttons
+            $oldmaxecl = $conf['maxseclevel'];
+            $conf['maxseclevel'] = 0;
+
             $alpha_data = p_render('xhtml', p_get_instructions($alpha_data), $info);
 
+            $conf['maxseclevel'] = $oldmaxecl ;
+
+            /*
             // remove toc, section edit buttons and category tags
             $patterns = array('!<div class="toc">.*?(</div>\n</div>)!s',
               // Remove all comments, to remove the "Edit section" button.
               // by that way, it solves too the preg_replace() "/e" modifier deprecation.
               //'#<!-- SECTION \[(\d*-\d*)\] -->#e',
-              '#<!-- .* -->#m',
-              '!<div class="category">.*?</div>!s');
-            $replace  = array('','','');
+              //'#<!-- SECTION \[(\d*-\d*)\] -->#',
+              //'#<!-- .* -->#m',
+              //'!<div class="category">.*?</div>!s'
+            );
+            $replace  = array('');
             $alpha_data = preg_replace($patterns, $replace, $alpha_data);
+            */
             $renderer->doc .= '<div id="alphaindex_content">' ;
-            $renderer->doc .= $ns_data;
-            $renderer->doc .= '<hr />';
+            //$renderer->doc .= $ns_data;
+            //$renderer->doc .= '<hr />';
             $renderer->doc .= $alpha_data;
             $renderer->doc .= '</div>' ;
             return true;
@@ -275,6 +285,8 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         ksort($alpha_data);
 
         // Display of results
+
+        $alphaOutput = '' ;
 
         // alphabetical index
         $alphaOutput .= $titleTpl . "\n";
