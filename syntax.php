@@ -3,10 +3,11 @@
 /**
  * Info Alphaindex: Displays the alphabetical index of a specified namespace.
  *
- * Version: 1.2
- * last modified: 2006-06-14 12:00:00
+ * Version: 1.3
+ * last modified: 2019-01-06 14:00:00
  * @license     GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author      Hubert Molière  <hubert.moliere@alternet.fr>
+ * Modified by  Cyrille G. <cyrille37 at giquello.fr>
  * Modified by  Nicolas H. <prog@a-et-n.com>
  * Modified by  Jonesy <jonesy@oryma.org>
  * Modified by  Samuele Tognini <samuele@netsons.org>
@@ -24,11 +25,11 @@ require_once(DOKU_INC.'inc/search.php');
 class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 
     function getType(){ return 'substition';}
-    
+
     function getAllowedTypes() { return array('baseonly', 'substition', 'formatting', 'paragraphs', 'protected'); }
 
     function getPType() { return 'block'; }
-    
+
     /**
      * Where to sort in?
      */
@@ -50,16 +51,16 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         $level = 0;
         $nons = true;
         $match = substr($match, 13, -2);
-        
+
         // split namespaces
         $match = preg_split('/\|/u', $match, 2);
-        
+
         // split level
         $ns_opt = preg_split('/\#/u', $match[0], 2);
-        
+
         // namespace name
         $ns = $ns_opt[0];
-        
+
         // add @NS@ option
         if(empty($ns) || $ns == '@NS@') {
             $pos = strrpos($ID,':');
@@ -69,20 +70,20 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 	              $ns = '.';
               }
         }
-        
+
         // level;
         if (is_numeric($ns_opt[1])) {
             $level = $ns_opt[1];
         }
-        
-        $match = explode(" ", $match[1]);
-        
+
+        $match = explode(' ', $match[1]);
+
         // namespaces option
         $nons = in_array('nons', $match);
-        
+
         // multi-columns option
         $incol = in_array('incol', $match);
-        
+
         return array($ns, array('level' => $level, 'nons' => $nons, 'incol' => $incol));
     }
 
@@ -101,15 +102,18 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                     $n = 'No index for <b>{{ns}}</b>';
                 }
             }
-            
+
             $alpha_data = str_replace('{{ns}}', cleanID($data[0]), $alpha_data);
 
             $alpha_data = p_render('xhtml', p_get_instructions($alpha_data), $info);
 
             // remove toc, section edit buttons and category tags
             $patterns = array('!<div class="toc">.*?(</div>\n</div>)!s',
-                            '#<!-- SECTION \[(\d*-\d*)\] -->#e',
-                            '!<div class="category">.*?</div>!s');
+              // Remove all comments, to remove the "Edit section" button.
+              // by that way, it solves too the preg_replace() "/e" modifier deprecation.
+              //'#<!-- SECTION \[(\d*-\d*)\] -->#e',
+              '#<!-- .* -->#m',
+              '!<div class="category">.*?</div>!s');
             $replace  = array('','','');
             $alpha_data = preg_replace($patterns, $replace, $alpha_data);
             $renderer->doc .= '<div id="alphaindex_content">' ;
@@ -119,7 +123,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= '</div>' ;
             return true;
         }
-        
+
         return false;
     }
 
@@ -161,19 +165,19 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         } else {
             $titleTpl = '===== Index =====';
         }
-        
+
         if($this->getConf('begin_letter_tpl')) {
             $beginLetterTpl = $this->getConf('begin_letter_tpl');
         } else {
             $beginLetterTpl = '==== {{letter}} ====';
         }
-        
+
         if($this->getConf('entry_tpl')) {
             $entryTpl = $this->getConf('entry_tpl');
         } else {
             $entryTpl = '  * [[{{link}}|{{name}}]]';
         }
-        
+
         if($this->getConf('end_letter_tpl')) {
             $endLetterTpl = $this->getConf('end_letter_tpl');
         } else {
@@ -202,7 +206,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
             $pos = strrpos(utf8_decode($tmpData), ':');
             if($conf['useheading']) {
                 $pageName = p_get_first_heading($tmpData);
-                
+
                 if($pageName == NULL) {
                     if($pos != FALSE) {
                         $pageName = utf8_substr($tmpData, $pos+1, utf8_strlen($tmpData));
@@ -217,7 +221,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                 } else {
                     $pageName = $tmpData;
                 }
-                
+
                 $pageName = str_replace('_', ' ', $pageName);
             }
             $pageNameArticle = '';
@@ -233,7 +237,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
                         }
                     }
                 }
-                
+
                 // Fix for useheading - Decide if the heading is used or the pagename
                 if($this->getConf('metadata_title')) {
                     $tmp = p_get_metadata($data[$cpt]['id']);
@@ -242,7 +246,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 
         		// R�cup�ration de la premi�re lettre du mot et classement
                 $firstLetter = utf8_deaccent(utf8_strtolower(utf8_substr($pageName, 0, 1)));
-                
+
                 if(is_numeric($firstLetter)) {
                     if($this->getConf('numerical_index')) {
                         $firstLetter = $this->getConf('numerical_index');
@@ -275,7 +279,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         // alphabetical index
         $alphaOutput .= $titleTpl . "\n";
         $nb_data = count($alpha_data);
-        
+
         foreach($alpha_data as $key => $currentLetter) {
             // Sorting of $currentLetter array
             usort($currentLetter, create_function('$a, $b', "return strnatcasecmp(\$a['id2'], \$b['id2']);"));
@@ -308,7 +312,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 function alphaindex_search_index(&$data, $base, $file, $type, $lvl, $opts) {
     $return = true;
     $item = array();
-   
+
     if($type == 'd'){
         if ($opts['level'] == $lvl) $return = false;
         if ($opts['nons']) return $return;
@@ -338,6 +342,6 @@ function alphaindex_search_index(&$data, $base, $file, $type, $lvl, $opts) {
 		 'type'  => $type,
 		 'level' => $lvl,
 		 'open'  => $return);
-    
+
     return $return;
 }
