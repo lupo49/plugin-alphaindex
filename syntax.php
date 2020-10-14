@@ -108,7 +108,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
 
             // remove toc, section edit buttons and category tags
             $patterns = array('!<div class="toc">.*?(</div>\n</div>)!s',
-                            '#<!-- SECTION \[(\d*-\d*)\] -->#e',
+                            '#<!-- SECTION \[(\d*-\d*)\] -->#',
                             '!<div class="category">.*?</div>!s');
             $replace  = array('','','');
             $alpha_data = preg_replace($patterns, $replace, $alpha_data);
@@ -338,6 +338,6 @@ function alphaindex_search_index(&$data, $base, $file, $type, $lvl, $opts) {
 		 'type'  => $type,
 		 'level' => $lvl,
 		 'open'  => $return);
-    
+
     return $return;
 }
