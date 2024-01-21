@@ -278,7 +278,7 @@ class syntax_plugin_alphaindex extends DokuWiki_Syntax_Plugin {
         
         foreach($alpha_data as $key => $currentLetter) {
             // Sorting of $currentLetter array
-            usort($currentLetter, create_function('$a, $b', "return strnatcasecmp(\$a['id2'], \$b['id2']);"));
+            usort($currentLetter, function($a, $b) {return strnatcasecmp($a['id2'], $b['id2']);});
 
             $begin = str_replace("{{letter}}" ,utf8_strtoupper($key), $beginLetterTpl);
             $alphaOutput .= $begin."\n";
